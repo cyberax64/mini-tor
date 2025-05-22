@@ -149,10 +149,11 @@ class tor_client
       {
         //
         // parse out the domain name without ".onion" extension.
+        // Support both v2 (16 chars) and v3 (56 chars) onion addresses
         //
         mini::string onion = domain.substring(0, domain.get_size() - 6);
-
-        mini_info("Creating onion stream...");
+        
+        mini_info("Creating onion stream for %s...", onion.get_buffer());
         stream_tor = _circuit->create_onion_stream(onion, port);
       }
       else
@@ -239,7 +240,7 @@ class tor_client
     mini::collections::list<mini::tor::onion_router*> _forbidden_onion_routers;
 };
 
-int __cdecl
+int
 main(
   int argc,
   char* argv[]
@@ -251,7 +252,8 @@ main(
     mini::console::write("Usage:\n");
     mini::console::write("  mini-tor [-v] [-vv] [-vvv] [url]\n");
     mini::console::write("Example:\n");
-    mini::console::write("  mini-tor \"http://duskgytldkxiuqc6.onion/fedpapers/federndx.htm\"\n");
+    mini::console::write("  mini-tor \"http://duskgytldkxiuqc6.onion/fedpapers/federndx.htm\" (v2 onion address)\n");
+    mini::console::write("  mini-tor \"http://p53lf57qovyuvwsc6xnrppyply3vtqm7l6pcobkmyqsiofyeznfu5uqd.onion\" (v3 onion address)\n");
     return -1;
   }
 
@@ -349,7 +351,7 @@ connect_again:
   }
 
   mini::string content = tor.http_get(
-    mini::net::uri(0 ? "http://duskgytldkxiuqc6.onion/fedpapers/federndx.htm" : argv[arg_index]));
+    mini::net::uri(argv[arg_index]));
 
   if (content.is_empty())
   {

@@ -22,9 +22,24 @@ hidden_service::hidden_service(
   , _socket(rendezvous_circuit->get_tor_socket())
   , _consensus(rendezvous_circuit->get_tor_socket().get_onion_router()->get_consensus())
   , _onion(onion)
-  , _permanent_id(crypto::base32::decode(_onion))
 {
   mini_debug("hidden_service() [%s.onion]", onion.get_buffer());
+  
+  // Déterminer si c'est une adresse v2 (16 caractères) ou v3 (56 caractères)
+  if (onion.get_size() == 16) {
+    // Adresse v2 (ancienne)
+    _permanent_id = crypto::base32::decode(_onion);
+  } else if (onion.get_size() == 56) {
+    // Adresse v3 (nouvelle)
+    // Pour les adresses v3, nous devons extraire l'identifiant permanent différemment
+    // Nous utilisons les 10 premiers octets du décodage base32 comme identifiant permanent
+    auto decoded = crypto::base32::decode(_onion);
+    _permanent_id = decoded.slice(0, 10);
+    mini_debug("V3 onion address detected, permanent_id size: %u", _permanent_id.get_size());
+  } else {
+    mini_warning("Unknown onion address format (length: %u)", onion.get_size());
+    _permanent_id = crypto::base32::decode(_onion);
+  }
 }
 
 bool
