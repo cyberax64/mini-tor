@@ -42,6 +42,11 @@ class tor_client
         {}, or_ports, _forbidden_onion_routers, flags
       });
 
+      // Vérifier que la liste n'est pas vide avant de générer un index aléatoire
+      if (routers.get_size() == 0) {
+        return;
+      }
+      
       auto random_router = routers[mini::crypto::random_device.get_random(routers.get_size())];
 
       if (random_router)

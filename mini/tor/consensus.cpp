@@ -240,7 +240,9 @@ consensus::get_random_onion_router_by_criteria(
 {
   auto routers = get_onion_routers_by_criteria(criteria);
 
-  const size_type random_index = crypto::random_device.get_random(routers.get_size());
+  // Vérifier que la liste n'est pas vide avant de générer un index aléatoire
+  const size_type random_index = routers.get_size() > 0 ? 
+    crypto::random_device.get_random(routers.get_size()) : 0;
 
   return !routers.is_empty()
     ? routers[random_index]
@@ -339,8 +341,12 @@ consensus::download_from_random_router_impl(
   //
   if (only_authorities || _onion_router_map.is_empty())
   {
+    // Vérifier que la liste d'autorités n'est pas vide
+    if (default_authority_list.get_size() == 0) {
+      return string();
+    }
+    
     const size_type random_index = crypto::random_device.get_random(default_authority_list.get_size());
-
     auto authority = default_authority_list[random_index];
 
     ip = authority.ip;
