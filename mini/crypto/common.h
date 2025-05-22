@@ -49,18 +49,30 @@
 // hash/hmac
 //
 #ifndef MINI_CRYPTO_HASH_NAMESPACE
+#ifdef MINI_OS_WINDOWS
 #define MINI_CRYPTO_HASH_NAMESPACE        cng   // [capi, cng]
+#else
+#define MINI_CRYPTO_HASH_NAMESPACE        capi   // [capi, cng]
+#endif
 #endif
 
 #ifndef MINI_CRYPTO_HMAC_NAMESPACE
+#ifdef MINI_OS_WINDOWS
 #define MINI_CRYPTO_HMAC_NAMESPACE        cng   // [capi, cng]
+#else
+#define MINI_CRYPTO_HMAC_NAMESPACE        capi   // [capi, cng]
+#endif
 #endif
 
 //
 // random device
 //
 #ifndef MINI_CRYPTO_RANDOM_NAMESPACE
+#ifdef MINI_OS_WINDOWS
 #define MINI_CRYPTO_RANDOM_NAMESPACE      cng   // [capi, cng]
+#else
+#define MINI_CRYPTO_RANDOM_NAMESPACE      capi   // [capi, cng]
+#endif
 #endif
 
 namespace mini::crypto {

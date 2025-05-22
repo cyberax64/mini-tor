@@ -5,8 +5,22 @@
 #include <mini/byte_buffer.h>
 #include <mini/string.h>
 
+#include <mini/win32_compat.h>
+
+#ifdef MINI_OS_WINDOWS
 #include <windows.h>
+#ifdef MINI_OS_WINDOWS
 #include <bcrypt.h>
+#else
+// Linux/OpenSSL equivalent headers
+#include <openssl/rsa.h>
+#include <openssl/pem.h>
+#endif
+#else
+// Linux/OpenSSL equivalent headers
+#include <openssl/rsa.h>
+#include <openssl/pem.h>
+#endif
 
 namespace mini::crypto::cng {
 

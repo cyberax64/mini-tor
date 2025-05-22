@@ -19,8 +19,8 @@ class string
 {
   public:
     using value_type              = char;
-    using size_type               = size_type;
-    using pointer_difference_type = pointer_difference_type;
+    using size_type = ::mini::size_type;
+    using pointer_difference_type = ::mini::pointer_difference_type;
 
     using pointer                 = value_type*;
     using const_pointer           = const value_type*;

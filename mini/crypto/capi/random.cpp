@@ -1,5 +1,8 @@
 #include "random.h"
+
+#ifdef MINI_OS_WINDOWS
 #include "provider.h"
+#endif
 
 namespace mini::crypto::capi {
 
@@ -19,10 +22,14 @@ random::get_random_bytes(
   mutable_byte_buffer_ref output
   )
 {
+#ifdef MINI_OS_WINDOWS
   CryptGenRandom(
     provider_factory.get_rsa_aes_handle(),
     static_cast<DWORD>(output.get_size()),
     output.get_buffer());
+#else
+  RAND_bytes(output.get_buffer(), static_cast<int>(output.get_size()));
+#endif
 }
 
 random random_device;

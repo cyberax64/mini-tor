@@ -4,7 +4,13 @@
 #include <mini/common.h>
 #include <mini/time.h>
 
+#ifdef MINI_OS_WINDOWS
 #include <windows.h>
+#else
+#include <pthread.h>
+#include <unistd.h>
+#include <signal.h>
+#endif
 
 namespace mini::threading {
 
@@ -121,12 +127,17 @@ class thread
       thread* thread_instance
       );
 
+#ifdef MINI_OS_WINDOWS
     //
     // it's quite important to not use the INVALID_HANDLE_VALUE constant,
     // because the value is same as "current process" pseudo-handle.
     //
     HANDLE _thread_handle = 0;
     DWORD _thread_id = 0;
+#else
+    pthread_t _thread_handle = 0;
+    uint32_t _thread_id = 0;
+#endif
     bool _has_been_terminated = false;
 };
 

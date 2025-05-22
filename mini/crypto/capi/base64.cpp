@@ -1,7 +1,14 @@
 #include "base64.h"
 #include "detail/base_encode.h"
 
+#ifdef MINI_OS_WINDOWS
 #include <wincrypt.h>
+#else
+// Définitions des constantes équivalentes à celles de Windows
+#define CRYPT_STRING_BASE64 0x00000001
+#define CRYPT_STRING_NOCRLF 0x40000000
+#define CRYPT_STRING_BASE64_ANY 0x00000006
+#endif
 
 namespace mini::crypto::capi {
 

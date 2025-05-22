@@ -10,14 +10,22 @@ mutex::mutex(
   void
   )
 {
+#ifdef MINI_OS_WINDOWS
   InitializeCriticalSection(&_critical_section);
+#else
+  pthread_mutex_init(&_mutex, nullptr);
+#endif
 }
 
 mutex::~mutex(
   void
   )
 {
+#ifdef MINI_OS_WINDOWS
   DeleteCriticalSection(&_critical_section);
+#else
+  pthread_mutex_destroy(&_mutex);
+#endif
 }
 
 void
@@ -25,7 +33,11 @@ mutex::acquire(
   void
   )
 {
+#ifdef MINI_OS_WINDOWS
   EnterCriticalSection(&_critical_section);
+#else
+  pthread_mutex_lock(&_mutex);
+#endif
 }
 
 void
@@ -33,7 +45,11 @@ mutex::release(
   void
   )
 {
+#ifdef MINI_OS_WINDOWS
   LeaveCriticalSection(&_critical_section);
+#else
+  pthread_mutex_unlock(&_mutex);
+#endif
 }
 
 //

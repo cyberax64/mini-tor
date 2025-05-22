@@ -20,8 +20,15 @@ file_iterator::file_iterator(
   const string_ref path
   )
 {
+#ifdef MINI_OS_WINDOWS
   _find_handle = FindFirstFileA(path.get_buffer(), &_find_data);
   _is_invalid = _find_handle == INVALID_HANDLE_VALUE;
+#else
+  // Sur Linux, nous utiliserions opendir/readdir
+  // Pour l'instant, nous marquons simplement comme invalide
+  _find_handle = INVALID_HANDLE_VALUE;
+  _is_invalid = true;
+#endif
 }
 
 file_iterator&
@@ -31,7 +38,13 @@ file_iterator::operator++(
 {
   if (!_is_invalid)
   {
+#ifdef MINI_OS_WINDOWS
     _is_invalid = !FindNextFileA(_find_handle, &_find_data);
+#else
+    // Sur Linux, nous utiliserions readdir
+    // Pour l'instant, nous marquons simplement comme invalide
+    _is_invalid = true;
+#endif
   }
 
   return *this;
@@ -68,12 +81,21 @@ file_iterator::operator*(
   void
   )
 {
+#ifdef MINI_OS_WINDOWS
   _cached_file_info = file_info {
     _find_data.cFileName,
       static_cast<file_size_type>(_find_data.nFileSizeHigh) << 32 |
       static_cast<file_size_type>(_find_data.nFileSizeLow),
     _find_data.dwFileAttributes
   };
+#else
+  // Sur Linux, nous retournons une info vide
+  _cached_file_info = file_info {
+    "",
+    0,
+    file_attributes(0)
+  };
+#endif
 
   return _cached_file_info;
 }

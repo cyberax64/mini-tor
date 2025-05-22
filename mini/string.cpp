@@ -449,15 +449,19 @@ string::format(
   va_list args;
   va_start(args, format);
 
-#if defined(MINI_MODE_KERNEL)
-  int chars = _vsnprintf(nullptr, 0, format.get_buffer(), args);
+#if defined(MINI_MODE_KERNEL) || defined(MINI_OS_LINUX)
+  int chars = vsnprintf(nullptr, 0, format.get_buffer(), args);
 #else
   int chars = _vscprintf(format.get_buffer(), args);
 #endif
 
   string result;
   result.resize(chars);
+#ifdef MINI_OS_LINUX
+  vsnprintf(result.get_buffer(), result.get_size() + 1, format.get_buffer(), args);
+#else
   vsprintf_s(result.get_buffer(), result.get_size() + 1, format.get_buffer(), args);
+#endif
 
   va_end(args);
 

@@ -1,3 +1,4 @@
+#include <cstring>
 #include "string_ref.h"
 #include "algorithm.h"
 
@@ -18,7 +19,7 @@ constexpr string_ref::string_ref(
 constexpr string_ref::string_ref(
   const char* value
   )
-  : buffer_ref<char>(value, value + traits_type::length(value))
+  : buffer_ref<char>(value, value + strlen(value))
 {
 
 }
@@ -215,7 +216,11 @@ string_ref::to_int(
   ) const
 {
   int result = 0;
+#ifdef MINI_OS_WINDOWS
   sscanf(get_buffer(), "%d", &result);
+#else
+  std::sscanf(get_buffer(), "%d", &result);
+#endif
 
   return result;
 }

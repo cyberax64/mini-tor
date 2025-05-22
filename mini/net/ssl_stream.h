@@ -89,10 +89,12 @@ class ssl_stream
       size_type size
       ) override;
 
-    using ssl_context = detail::ssl_context;
-
     io::stream& _underlying_stream;
-    ssl_context _context;
+#ifdef MINI_OS_WINDOWS
+    detail::ssl_context _context;
+#else
+    detail::ssl_context* _context;
+#endif
 };
 
 }

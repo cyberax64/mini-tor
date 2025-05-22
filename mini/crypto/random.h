@@ -1,7 +1,9 @@
 #pragma once
 #include "common.h"
 #include "capi/random.h"
+#ifdef MINI_OS_WINDOWS
 #include "cng/random.h"
+#endif
 
 namespace mini::crypto {
 

@@ -4,9 +4,16 @@
 
 #include <mini/byte_buffer.h>
 #include <mini/string.h>
+#include <mini/win32_compat.h>
 
+#ifdef MINI_OS_WINDOWS
 #include <windows.h>
 #include <wincrypt.h>
+#else
+// Linux/OpenSSL equivalent headers
+#include <openssl/rsa.h>
+#include <openssl/pem.h>
+#endif
 
 //
 // http://stackoverflow.com/questions/1231178/load-an-x509-pem-file-into-windows-cryptoapi

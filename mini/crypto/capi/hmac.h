@@ -1,6 +1,13 @@
 #pragma once
 #include "hash.h"
 
+#ifdef MINI_OS_WINDOWS
+#include <windows.h>
+#include <wincrypt.h>
+#else
+#include <openssl/hmac.h>
+#endif
+
 namespace mini::crypto::capi {
 
 template <
@@ -82,7 +89,11 @@ class hmac
       void
       );
 
+#ifdef MINI_OS_WINDOWS
     HCRYPTKEY _key_handle = 0;
+#else
+    byte_buffer _key;
+#endif
 };
 
 }

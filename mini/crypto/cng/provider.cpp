@@ -89,6 +89,7 @@ provider::init(
   void
   )
 {
+#ifdef MINI_OS_WINDOWS
   //
   // alternative provider
   //
@@ -194,6 +195,20 @@ provider::init(
     BCRYPT_SHA256_ALGORITHM,
     NULL,
     BCRYPT_ALG_HANDLE_HMAC_FLAG);
+#else
+  // Sur Linux, nous utilisons OpenSSL directement
+  for (int i = 0; i < static_cast<int>(cipher_mode::max); i++)
+  {
+    _provider_aes[i] = nullptr;
+  }
+  
+  _provider_rsa = nullptr;
+  _provider_dh = nullptr;
+  _provider_curve25519 = nullptr;
+  _provider_rng = nullptr;
+  _provider_hash_sha1 = nullptr;
+  _provider_hash_hmac_sha256 = nullptr;
+#endif
 }
 
 void
@@ -201,6 +216,7 @@ provider::destroy(
   void
   )
 {
+#ifdef MINI_OS_WINDOWS
   if (_provider_hash_hmac_sha256)
   {
     BCryptCloseAlgorithmProvider(
@@ -252,6 +268,20 @@ provider::destroy(
         0);
     }
   }
+#else
+  // Rien à faire sur Linux
+  _provider_hash_hmac_sha256 = nullptr;
+  _provider_hash_sha1 = nullptr;
+  _provider_rng = nullptr;
+  _provider_curve25519 = nullptr;
+  _provider_dh = nullptr;
+  _provider_rsa = nullptr;
+  
+  for (int i = 0; i < static_cast<int>(cipher_mode::max); i++)
+  {
+    _provider_aes[i] = nullptr;
+  }
+#endif
 }
 
 void
@@ -259,6 +289,7 @@ provider::init_win10(
   void
   )
 {
+#ifdef MINI_OS_WINDOWS
   //
   // ""
   //    beginning in Windows 10, CNG provides pre-defined algorithm handles for many algorithms.
@@ -297,7 +328,20 @@ provider::init_win10(
     (PBYTE)BCRYPT_ECC_CURVE_25519,
     sizeof(BCRYPT_ECC_CURVE_25519),
     0);
-
+#else
+  // Sur Linux, nous utilisons OpenSSL directement
+  for (int i = 0; i < static_cast<int>(cipher_mode::max); i++)
+  {
+    _provider_aes[i] = nullptr;
+  }
+  
+  _provider_rsa = nullptr;
+  _provider_dh = nullptr;
+  _provider_curve25519 = nullptr;
+  _provider_rng = nullptr;
+  _provider_hash_sha1 = nullptr;
+  _provider_hash_hmac_sha256 = nullptr;
+#endif
 }
 
 void
@@ -305,12 +349,17 @@ provider::destroy_win10(
   void
   )
 {
+#ifdef MINI_OS_WINDOWS
   if (_provider_curve25519)
   {
     BCryptCloseAlgorithmProvider(
       _provider_curve25519,
       0);
   }
+#else
+  // Rien à faire sur Linux
+  _provider_curve25519 = nullptr;
+#endif
 }
 
 

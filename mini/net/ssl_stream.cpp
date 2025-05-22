@@ -8,7 +8,12 @@ ssl_stream::ssl_stream(
   )
   : _underlying_stream(underlying_stream)
 {
+#ifdef MINI_OS_WINDOWS
   _context.initialize(_underlying_stream, target_name);
+#else
+  _context = new detail::ssl_context();
+  _context->initialize(_underlying_stream, target_name);
+#endif
 }
 
 ssl_stream::~ssl_stream(
@@ -16,6 +21,13 @@ ssl_stream::~ssl_stream(
   )
 {
   close();
+#ifndef MINI_OS_WINDOWS
+  if (_context)
+  {
+    delete _context;
+    _context = nullptr;
+  }
+#endif
 }
 
 void
@@ -23,7 +35,14 @@ ssl_stream::close(
   void
   )
 {
+#ifdef MINI_OS_WINDOWS
   _context.disconnect();
+#else
+  if (_context)
+  {
+    _context->disconnect();
+  }
+#endif
 }
 
 bool
@@ -59,7 +78,11 @@ ssl_stream::handshake(
   MINI_UNREFERENCED(host);
   MINI_UNREFERENCED(port);
 
+#ifdef MINI_OS_WINDOWS
   return _context.handshake() == SEC_E_OK;
+#else
+  return _context && _context->handshake() == 0;
+#endif
 }
 
 size_type
@@ -109,7 +132,11 @@ ssl_stream::is_handshake_established(
   void
   ) const
 {
+#ifdef MINI_OS_WINDOWS
   return _context.is_valid();
+#else
+  return _context && _context->is_valid();
+#endif
 }
 
 size_type
@@ -122,7 +149,11 @@ ssl_stream::read_impl(
     static_cast<byte_type*>(buffer),
     static_cast<byte_type*>(buffer) + size);
 
+#ifdef MINI_OS_WINDOWS
   return _context.read(buf);
+#else
+  return _context ? _context->read(buf) : 0;
+#endif
 }
 
 size_type
@@ -135,7 +166,11 @@ ssl_stream::write_impl(
     static_cast<const byte_type*>(buffer),
     static_cast<const byte_type*>(buffer) + size);
 
+#ifdef MINI_OS_WINDOWS
   return _context.write(buf);
+#else
+  return _context ? _context->write(buf) : 0;
+#endif
 }
 
 }

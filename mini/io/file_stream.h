@@ -2,7 +2,40 @@
 #include "stream.h"
 #include <mini/string.h>
 
+#include <mini/common.h>
+
+#ifdef MINI_OS_WINDOWS
 #include <windows.h>
+#else
+// Définitions des types équivalents pour Linux
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
+typedef void* HANDLE;
+typedef unsigned long DWORD;
+#define INVALID_HANDLE_VALUE ((HANDLE)-1)
+#define FILE_BEGIN SEEK_SET
+#define FILE_CURRENT SEEK_CUR
+#define FILE_END SEEK_END
+
+// Définitions Windows pour les accès fichiers
+#define GENERIC_READ 0x80000000L
+#define GENERIC_WRITE 0x40000000L
+#define CREATE_ALWAYS 2
+#define CREATE_NEW 1
+#define OPEN_EXISTING 3
+#define OPEN_ALWAYS 4
+#define TRUNCATE_EXISTING 5
+#define FILE_SHARE_DELETE 0x00000004
+#define FILE_SHARE_READ 0x00000001
+#define FILE_SHARE_WRITE 0x00000002
+#define FILE_FLAG_DELETE_ON_CLOSE 0x04000000
+#define FILE_FLAG_RANDOM_ACCESS 0x10000000
+#define FILE_FLAG_SEQUENTIAL_SCAN 0x08000000
+#define FILE_FLAG_WRITE_THROUGH 0x80000000
+#endif
 
 namespace mini::io {
 
@@ -115,6 +148,7 @@ class file_stream
         real_mode = (DWORD)file_mode::open_or_create;
       }
 
+#ifdef MINI_OS_WINDOWS
       _file_handle = CreateFile(
         path.get_buffer(),
         (DWORD)_access,
@@ -123,6 +157,33 @@ class file_stream
         (DWORD)real_mode,
         (DWORD)_options,
         NULL);
+#else
+      // Conversion des flags Windows en flags Linux
+      int flags = 0;
+      
+      // Access mode
+      if (_access == file_access::read)
+        flags |= O_RDONLY;
+      else if (_access == file_access::write)
+        flags |= O_WRONLY;
+      else if (_access == file_access::read_write)
+        flags |= O_RDWR;
+        
+      // File mode
+      if (_mode == file_mode::create || _mode == file_mode::create_new)
+        flags |= O_CREAT | O_TRUNC;
+      else if (_mode == file_mode::open_or_create)
+        flags |= O_CREAT;
+      else if (_mode == file_mode::truncate)
+        flags |= O_TRUNC;
+        
+      // Options
+      if ((DWORD)_options & FILE_FLAG_WRITE_THROUGH)
+        flags |= O_SYNC;
+        
+      int fd = ::open(path.get_buffer(), flags, 0666);
+      _file_handle = fd < 0 ? INVALID_HANDLE_VALUE : (HANDLE)(intptr_t)fd;
+#endif
 
       if (_mode == file_mode::append)
       {
@@ -142,7 +203,11 @@ class file_stream
         //         _share   = (file_share)0;
         //         _options = (file_options)0;
 
+#ifdef MINI_OS_WINDOWS
         CloseHandle(_file_handle);
+#else
+        ::close((int)(intptr_t)_file_handle);
+#endif
 
         _file_handle = INVALID_HANDLE_VALUE;
       }
@@ -183,10 +248,14 @@ class file_stream
          ? FILE_CURRENT : origin == seek_origin::end
          ? FILE_END     : FILE_CURRENT;
 
+#ifdef MINI_OS_WINDOWS
       return SetFilePointer(_file_handle,
         (DWORD)offset,
         NULL,
         move_method);
+#else
+      return lseek((int)(intptr_t)_file_handle, offset, move_method);
+#endif
     }
 
     void
@@ -194,7 +263,11 @@ class file_stream
       void
       ) override
     {
+#ifdef MINI_OS_WINDOWS
       FlushFileBuffers(_file_handle);
+#else
+      fsync((int)(intptr_t)_file_handle);
+#endif
     }
 
     size_type
@@ -202,9 +275,15 @@ class file_stream
       void
       ) const override
     {
+#ifdef MINI_OS_WINDOWS
       return GetFileSize(
         _file_handle,
         NULL);
+#else
+      struct stat st;
+      fstat((int)(intptr_t)_file_handle, &st);
+      return st.st_size;
+#endif
     }
 
     size_type
@@ -230,6 +309,7 @@ class file_stream
       size_type size
       ) override
     {
+#ifdef MINI_OS_WINDOWS
       DWORD bytes_read;
       ReadFile(
         _file_handle,
@@ -239,6 +319,9 @@ class file_stream
         NULL);
 
       return bytes_read;
+#else
+      return ::read((int)(intptr_t)_file_handle, buffer, size);
+#endif
     }
 
     size_type
@@ -247,6 +330,7 @@ class file_stream
       size_type size
       ) override
     {
+#ifdef MINI_OS_WINDOWS
       DWORD bytes_written;
       WriteFile(_file_handle,
         buffer,
@@ -255,6 +339,9 @@ class file_stream
         NULL);
 
       return bytes_written;
+#else
+      return ::write((int)(intptr_t)_file_handle, buffer, size);
+#endif
     }
 
     HANDLE _file_handle;

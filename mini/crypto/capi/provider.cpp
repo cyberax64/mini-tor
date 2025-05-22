@@ -39,6 +39,7 @@ provider::init(
   void
   )
 {
+#ifdef MINI_OS_WINDOWS
   //
   // alternative provider
   //
@@ -63,6 +64,11 @@ provider::init(
     MS_ENH_DSS_DH_PROV,
     PROV_DSS_DH,
     CRYPT_VERIFYCONTEXT);
+#else
+  // Sur Linux, nous utilisons OpenSSL directement, donc pas besoin d'initialiser des handles
+  _provider_rsa_aes_handle = nullptr;
+  _provider_dh_handle = nullptr;
+#endif
 }
 
 void
@@ -70,6 +76,7 @@ provider::destroy(
   void
   )
 {
+#ifdef MINI_OS_WINDOWS
   if (_provider_dh_handle)
   {
     CryptReleaseContext(
@@ -85,6 +92,11 @@ provider::destroy(
       0);
     _provider_rsa_aes_handle = 0;
   }
+#else
+  // Rien à faire sur Linux
+  _provider_dh_handle = nullptr;
+  _provider_rsa_aes_handle = nullptr;
+#endif
 }
 
 }

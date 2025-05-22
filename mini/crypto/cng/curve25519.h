@@ -4,8 +4,28 @@
 #include <mini/byte_buffer.h>
 #include <mini/string.h>
 
+#ifdef MINI_OS_WINDOWS
 #include <windows.h>
+#ifdef MINI_OS_WINDOWS
 #include <bcrypt.h>
+#else
+// Linux/OpenSSL equivalent headers
+#include <openssl/rsa.h>
+#include <openssl/pem.h>
+#endif
+#else
+// Définitions des types équivalents pour Linux
+typedef struct _BCRYPT_ECCKEY_BLOB {
+  DWORD dwMagic;
+  DWORD cbKey;
+} BCRYPT_ECCKEY_BLOB;
+
+#define BCRYPT_ECCPUBLIC_BLOB  L"ECCPUBLICBLOB"
+#define BCRYPT_ECCPRIVATE_BLOB L"ECCPRIVATEBLOB"
+#define BCRYPT_ECDH_PUBLIC_GENERIC_MAGIC  0x314B4345  // ECK1
+#define BCRYPT_ECDH_PRIVATE_GENERIC_MAGIC 0x324B4345  // ECK2
+#define BCRYPT_KDF_RAW_SECRET L"RAWSECRET"
+#endif
 
 namespace mini::crypto::cng {
 

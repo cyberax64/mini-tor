@@ -2,7 +2,11 @@
 #if defined(MINI_CONFIG_NO_DEFAULT_LIBS)
 #include <cstdlib>
 
+#include <mini/win32_compat.h>
+
+#ifdef MINI_OS_WINDOWS
 #include <windows.h>
+#endif
 #include <shellapi.h>
 
 extern "C" {

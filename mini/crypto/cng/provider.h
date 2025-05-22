@@ -3,8 +3,19 @@
 
 #include <mini/common.h>
 
+#ifdef MINI_OS_WINDOWS
 #include <windows.h>
+#ifdef MINI_OS_WINDOWS
 #include <bcrypt.h>
+#else
+// Linux/OpenSSL equivalent headers
+#include <openssl/rsa.h>
+#include <openssl/pem.h>
+#endif
+#else
+// Définitions des types équivalents pour Linux
+typedef void* BCRYPT_ALG_HANDLE;
+#endif
 
 namespace mini::crypto::cng {
 

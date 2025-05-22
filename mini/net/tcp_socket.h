@@ -3,7 +3,28 @@
 #include <mini/net/ip_address.h>
 #include <mini/io/stream.h>
 
+#ifdef MINI_OS_WINDOWS
 #include <winsock2.h>
+#else
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+
+// Définitions pour la compatibilité avec Windows
+#ifndef SOCKET
+typedef int SOCKET;
+#endif
+#ifndef INVALID_SOCKET
+#define INVALID_SOCKET (-1)
+#endif
+#ifndef SOCKET_ERROR
+#define SOCKET_ERROR (-1)
+#endif
+#define closesocket(s) ::close(s)
+#endif
 
 namespace mini::net {
 

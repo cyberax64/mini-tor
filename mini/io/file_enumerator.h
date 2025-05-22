@@ -2,8 +2,27 @@
 #include "file_attributes.h"
 
 #include <mini/string.h>
+#include <mini/common.h>
 
+#ifdef MINI_OS_WINDOWS
 #include <windows.h>
+#else
+#include <dirent.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+// Définitions des types Windows pour Linux
+typedef void* HANDLE;
+#define INVALID_HANDLE_VALUE ((HANDLE)-1)
+typedef struct _WIN32_FIND_DATAA {
+    uint32_t dwFileAttributes;
+    char cFileName[260];
+    char cAlternateFileName[14];
+    uint32_t nFileSizeLow;
+    uint32_t nFileSizeHigh;
+} WIN32_FIND_DATAA;
+#endif
 
 namespace mini::io {
 

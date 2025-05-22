@@ -26,11 +26,24 @@ struct MINI_UNREFERENCED_PARAMETER_PACK_impl
 # define MINI_COMPILER_CLANG
 #elif defined(_MSC_VER)
 # define MINI_COMPILER_MSVC
+#elif defined(__GNUC__)
+# define MINI_COMPILER_GCC
 #else
 # error "Unknown compiler!"
 #endif
 
-#if defined(MINI_COMPILER_CLANG)
+// Définir le système d'exploitation
+#if defined(_WIN32) || defined(_WIN64)
+# define MINI_OS_WINDOWS
+#elif defined(__linux__)
+# define MINI_OS_LINUX
+#elif defined(__APPLE__)
+# define MINI_OS_MACOS
+#else
+# error "Unknown operating system!"
+#endif
+
+#if defined(MINI_COMPILER_CLANG) || defined(MINI_COMPILER_GCC)
 # define MINI_UNREACHABLE   __builtin_unreachable()
 #elif defined(MINI_COMPILER_MSVC)
 # define MINI_UNREACHABLE   __assume(0)
@@ -46,20 +59,22 @@ struct MINI_UNREFERENCED_PARAMETER_PACK_impl
 # define MINI_CONFIG_NO_DEFAULT_LIBS
 #endif
 
-#if defined(_M_IX86)
+#if defined(_M_IX86) || defined(__i386__)
 # define MINI_ARCH_X86
 # define MINI_ARCH_BITS 32
-#elif defined(_M_X64)
+#elif defined(_M_X64) || defined(__x86_64__)
 # define MINI_ARCH_X64
 # define MINI_ARCH_BITS 64
-#elif defined(_M_ARM)
+#elif defined(_M_ARM) || defined(__arm__)
 # define MINI_ARCH_ARM32
 # define MINI_ARCH_BITS 32
-#elif defined(_M_ARM64)
+#elif defined(_M_ARM64) || defined(__aarch64__)
 # define MINI_ARCH_ARM64
 # define MINI_ARCH_BITS 64
 #else
-# error "Unknown architecture!"
+# define MINI_ARCH_X64
+# define MINI_ARCH_BITS 64
+# warning "Architecture not explicitly detected, assuming x64"
 #endif
 
 #if defined(_KERNEL_MODE)
@@ -207,4 +222,6 @@ assert(
 
 }
 
+#if defined(MINI_OS_WINDOWS)
 #include <mini/crt/crt0.h>
+#endif

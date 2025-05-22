@@ -3,9 +3,17 @@
 #include "../base/key.h"
 
 #include <mini/common.h>
+#include <mini/win32_compat.h>
 
+#ifdef MINI_OS_WINDOWS
 #include <windows.h>
 #include <wincrypt.h>
+#else
+// Linux/OpenSSL equivalent headers
+#include <openssl/evp.h>
+#include <openssl/rsa.h>
+#include <openssl/pem.h>
+#endif
 
 namespace mini::crypto::capi {
 

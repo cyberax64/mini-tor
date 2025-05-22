@@ -1,5 +1,8 @@
 #include "hmac.h"
+
+#ifdef MINI_OS_WINDOWS
 #include "provider.h"
+#endif
 
 namespace mini::crypto::capi {
 
@@ -13,7 +16,12 @@ template <
 hmac<HASH_TYPE>::hmac(
   const byte_buffer_ref key
   )
+#ifdef MINI_OS_WINDOWS
   : HASH_TYPE(detail::hash_algorithm_type_map[static_cast<int>(hash_algorithm)], key, _key_handle)
+#else
+  : HASH_TYPE(detail::hash_algorithm_type_map[static_cast<int>(hash_algorithm)], key)
+  , _key(key)
+#endif
 {
 
 }
@@ -104,7 +112,11 @@ hmac<HASH_TYPE>::swap(
   )
 {
   HASH_TYPE::swap(other);
+#ifdef MINI_OS_WINDOWS
   mini::swap(_key_handle, other._key_handle);
+#else
+  mini::swap(_key, other._key);
+#endif
 }
 
 //
@@ -135,11 +147,15 @@ hmac<HASH_TYPE>::destroy(
 {
   HASH_TYPE::destroy();
 
+#ifdef MINI_OS_WINDOWS
   if (_key_handle)
   {
     CryptDestroyKey(_key_handle);
     _key_handle = 0;
   }
+#else
+  _key.clear();
+#endif
 }
 
 

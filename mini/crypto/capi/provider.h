@@ -1,8 +1,13 @@
 #pragma once
 #include <mini/common.h>
 
+#ifdef MINI_OS_WINDOWS
 #include <windows.h>
 #include <wincrypt.h>
+#else
+// Définitions des types équivalents pour Linux
+typedef void* HCRYPTPROV;
+#endif
 
 namespace mini::crypto::capi {
 

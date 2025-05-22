@@ -1,7 +1,9 @@
 #pragma once
 #include "common.h"
 #include "capi/hmac.h"
+#ifdef MINI_OS_WINDOWS
 #include "cng/hmac.h"
+#endif
 
 namespace mini::crypto {
 

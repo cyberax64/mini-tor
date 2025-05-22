@@ -1,7 +1,14 @@
 #pragma once
 #include <mini/common.h>
 
+#ifdef MINI_OS_WINDOWS
 #include <windows.h>
+#else
+#include <unistd.h>
+#include <sys/time.h>
+#include <ctime>
+#include <cstdio>
+#endif
 
 #define MINI_LOG_ENABLED 1
 

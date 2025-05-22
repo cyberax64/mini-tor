@@ -16,6 +16,8 @@
 
 namespace mini::net::detail {
 
+#ifdef MINI_OS_WINDOWS
+
 static PSecurityFunctionTable sspi = nullptr;
 
 static void __cdecl
@@ -44,12 +46,18 @@ void __cdecl
 ssl_context_global_destroy(
   void
   )
+
+#endif // MINI_OS_WINDOWS
+
+#ifdef MINI_OS_WINDOWS
 {
 
 }
+#endif // MINI_OS_WINDOWS
 
 //////////////////////////////////////////////////////////////////////////
 
+#ifdef MINI_OS_WINDOWS
 //
 // cred_handle
 //
@@ -99,9 +107,11 @@ cred_handle::is_valid(
   void
   ) const
 {
-  return SecIsValidHandle(this);
+  return !SecIsValidHandle(this) ? false : true;
 }
+#endif // MINI_OS_WINDOWS
 
+#ifdef MINI_OS_WINDOWS
 //
 // ctxt_handle
 //
@@ -137,7 +147,9 @@ ctxt_handle::initialize(
     &out_flags,
     NULL);
 }
+#endif // MINI_OS_WINDOWS
 
+#ifdef MINI_OS_WINDOWS
 void
 ctxt_handle::destroy(
   void
@@ -167,7 +179,8 @@ ctxt_handle::apply_control_token(
     this,
     &out_buffer_desc);
 }
-
+#endif // MINI_OS_WINDOWS
+#ifdef MINI_OS_WINDOWS
 SECURITY_STATUS
 ctxt_handle::query_attributes(
   unsigned long attribute,
@@ -179,11 +192,13 @@ ctxt_handle::query_attributes(
     attribute,
     buffer);
 }
+#endif // MINI_OS_WINDOWS
 
 //
 // ssl_context
 //
 
+#ifdef MINI_OS_WINDOWS
 ssl_context::ssl_context(
   void
   )
@@ -889,5 +904,6 @@ ssl_context::decrypt_message_impl(
 {
   return sspi->DecryptMessage(&_ctxt_handle, &message_desc, 0, NULL);
 }
+#endif // MINI_OS_WINDOWS
 
-}
+} // namespace mini::net::detail

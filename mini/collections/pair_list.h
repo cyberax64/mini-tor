@@ -12,7 +12,7 @@ class pair_list
 {
   public:
     using value_type              = pair<TKey, TValue>;
-    using size_type               = size_type;
+    using size_type = ::mini::size_type;
     using difference_type         = pointer_difference_type;
 
     // using allocator_type          = Allocator;

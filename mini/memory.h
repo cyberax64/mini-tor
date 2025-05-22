@@ -1,17 +1,18 @@
 #pragma once
 #include <type_traits>
+#include <cstddef> // Pour std::size_t
 
 namespace mini::memory {
 
 void*
 allocate(
-  size_t size
+  std::size_t size
   );
 
 void*
 reallocate(
   void* ptr,
-  size_t new_size
+  std::size_t new_size
   );
 
 void

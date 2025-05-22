@@ -23,8 +23,8 @@ class buffer_ref
 {
   public:
     using value_type              = T;
-    using size_type               = size_type;
-    using pointer_difference_type = pointer_difference_type;
+    using size_type = ::mini::size_type;
+    using pointer_difference_type = ::mini::pointer_difference_type;
 
     using pointer                 = value_type*;
     using const_pointer           = const value_type*;
@@ -227,7 +227,7 @@ class buffer_ref
 
   protected:
     template <
-      typename T
+      typename U
     >
     friend class mutable_buffer_ref;
 
@@ -243,8 +243,8 @@ class mutable_buffer_ref
 {
   public:
     using value_type              = T;
-    using size_type               = size_type;
-    using pointer_difference_type = pointer_difference_type;
+    using size_type = ::mini::size_type;
+    using pointer_difference_type = ::mini::pointer_difference_type;
 
     using pointer                 = value_type*;
     using const_pointer           = const value_type*;

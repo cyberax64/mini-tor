@@ -3,6 +3,13 @@
 
 #include <type_traits>
 
+#ifdef MINI_OS_WINDOWS
+#include <windows.h>
+#include <wincrypt.h>
+#else
+#include <openssl/rand.h>
+#endif
+
 namespace mini::crypto::capi {
 
 class random

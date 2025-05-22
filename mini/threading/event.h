@@ -5,7 +5,12 @@
 #include <mini/time.h>
 #include <mini/buffer_ref.h>
 
+#ifdef MINI_OS_WINDOWS
 #include <windows.h>
+#else
+#include <pthread.h>
+#include <sys/time.h>
+#endif
 
 namespace mini::threading {
 
@@ -71,7 +76,14 @@ class event
       );
 
   private:
+#ifdef MINI_OS_WINDOWS
     HANDLE _event;
+#else
+    pthread_mutex_t _mutex;
+    pthread_cond_t _cond;
+    bool _signaled;
+    bool _is_auto_reset;
+#endif
 };
 
 }

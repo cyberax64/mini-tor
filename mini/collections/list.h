@@ -14,7 +14,7 @@ class list
 {
   public:
     using value_type              = T;
-    using size_type               = size_type;
+    using size_type = ::mini::size_type;
     using difference_type         = pointer_difference_type;
 
     using allocator_type          = Allocator;

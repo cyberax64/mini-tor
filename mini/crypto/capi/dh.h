@@ -3,9 +3,16 @@
 #include "../common.h"
 
 #include <mini/byte_buffer.h>
+#include <mini/win32_compat.h>
 
+#ifdef MINI_OS_WINDOWS
 #include <windows.h>
 #include <wincrypt.h>
+#else
+// Linux/OpenSSL equivalent headers
+#include <openssl/dh.h>
+#include <openssl/bn.h>
+#endif
 
 //
 // https://msdn.microsoft.com/en-us/library/windows/desktop/aa381969(v=vs.85).aspx

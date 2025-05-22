@@ -1,5 +1,6 @@
 #include "common.h"
 #include <mini/logger.h>
+#include <cstdlib>
 
 namespace mini {
 
@@ -20,7 +21,12 @@ assert(
   if (!expression)
   {
     mini_error("!! assertion failed !! %s at %s:%i)", expression_str, filename, line);
+#if defined(MINI_OS_WINDOWS)
     __debugbreak();
+#else
+    // Sur Linux, on utilise abort() pour arrêter le programme
+    abort();
+#endif
   }
 }
 

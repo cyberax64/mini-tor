@@ -2,8 +2,14 @@
 #include "../common.h"
 #include <mini/byte_buffer.h>
 
+#ifdef MINI_OS_WINDOWS
 #include <windows.h>
 #include <wincrypt.h>
+#else
+#include <openssl/evp.h>
+#include <openssl/sha.h>
+#include <openssl/md5.h>
+#endif
 
 namespace mini::crypto::capi {
 
@@ -97,6 +103,7 @@ class hash
       void
       );
 
+#ifdef MINI_OS_WINDOWS
   protected:
     hash(
       ALG_ID alg_id,
@@ -128,6 +135,40 @@ class hash
 
   private:
     HCRYPTHASH _hash_handle = 0;
+#else
+  protected:
+    hash(
+      const EVP_MD* md_type,
+      const byte_buffer_ref key
+      );
+
+    void
+    init(
+      const EVP_MD* md_type
+      );
+
+    void
+    init(
+      const EVP_MD* md_type,
+      const byte_buffer_ref key
+      );
+
+    void
+    destroy(
+      void
+      );
+
+    void
+    duplicate_internal(
+      const hash& other
+      );
+
+  private:
+    EVP_MD_CTX* _md_ctx = nullptr;
+    unsigned char _hash_value[EVP_MAX_MD_SIZE];
+    unsigned int _hash_len = 0;
+    bool _finalized = false;
+#endif
 };
 
 }

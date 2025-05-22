@@ -1,7 +1,13 @@
 #include "time.h"
 
+#ifdef MINI_OS_WINDOWS
 #include <windows.h>
 #include <winternl.h>
+#else
+#include <sys/time.h>
+#include <time.h>
+#include <unistd.h>
+#endif
 
 // struct tm
 // {
@@ -16,6 +22,7 @@
 //   int tm_isdst; // daylight savings time flag
 // };
 
+#ifdef MINI_OS_WINDOWS
 extern "C"
 uint32_t __cdecl
 time(
@@ -27,6 +34,7 @@ uint32_t __cdecl
 _mkgmtime(
   struct tm* timeptr
   );
+#endif
 
 namespace mini {
 
@@ -78,7 +86,11 @@ time::parse(
   system_time.tm_mon  -=     1;
   system_time.tm_isdst =    -1;
 
+#ifdef MINI_OS_WINDOWS
   _timestamp = _mkgmtime(&system_time);
+#else
+  _timestamp = timegm(&system_time);
+#endif
 }
 
 uint32_t
@@ -98,7 +110,11 @@ time::now(
   void
   )
 {
+#ifdef MINI_OS_WINDOWS
   return ::time(nullptr);
+#else
+  return ::time(nullptr);
+#endif
 }
 
 timestamp_type
@@ -106,7 +122,13 @@ time::timestamp(
   void
   )
 {
+#ifdef MINI_OS_WINDOWS
   return GetTickCount();
+#else
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+#endif
 }
 
 //

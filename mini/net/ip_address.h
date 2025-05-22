@@ -2,7 +2,12 @@
 #include <mini/string.h>
 #include <mini/ctl.h>
 
+#ifdef MINI_OS_WINDOWS
 #include <winsock2.h>
+#else
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#endif
 
 namespace mini::net {
 
@@ -85,7 +90,11 @@ class ip_address
       ) const
     {
       in_addr result;
+#ifdef MINI_OS_WINDOWS
       result.S_un.S_addr = _ip;
+#else
+      result.s_addr = _ip;
+#endif
 
       return result;
     }

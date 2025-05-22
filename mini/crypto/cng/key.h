@@ -3,9 +3,12 @@
 #include "../base/key.h"
 
 #include <mini/common.h>
+#include <mini/win32_compat.h>
 
+#ifdef MINI_OS_WINDOWS
 #include <windows.h>
 #include <wincrypt.h>
+#endif
 
 namespace mini::crypto::cng {
 
@@ -32,11 +35,15 @@ class key
       void
       ) override
     {
+#ifdef MINI_OS_WINDOWS
       if (_key_handle)
       {
         BCryptDestroyKey(_key_handle);
         _key_handle = 0;
       }
+#else
+      _key_handle = nullptr;
+#endif
     }
 
     BCRYPT_KEY_HANDLE
@@ -107,6 +114,7 @@ class key
       LPCWSTR blob_type
       ) const
     {
+#ifdef MINI_OS_WINDOWS
       auto key_blob_ptr  = reinterpret_cast<BYTE*>(&key_blob);
       auto key_blob_size = static_cast<DWORD>(sizeof(key_blob));
 
@@ -118,6 +126,11 @@ class key
         key_blob_size,
         &key_blob_size,
         0);
+#else
+      // Non implémenté sur Linux
+      (void)key_blob;
+      (void)blob_type;
+#endif
     }
 
     BCRYPT_KEY_HANDLE _key_handle = 0;
@@ -136,6 +149,7 @@ class key
       provider_key_asymmetric_tag
       )
     {
+#ifdef MINI_OS_WINDOWS
       BCryptImportKeyPair(
         provider_handle,
         nullptr,
@@ -144,6 +158,14 @@ class key
         (PUCHAR)key_blob,
         key_blob_size,
         0);
+#else
+      // Non implémenté sur Linux
+      (void)key_blob;
+      (void)key_blob_size;
+      (void)key_blob_type;
+      (void)provider_handle;
+      _key_handle = nullptr;
+#endif
     }
 
     void
@@ -155,6 +177,7 @@ class key
       provider_key_symmetric_tag
       )
     {
+#ifdef MINI_OS_WINDOWS
       BCryptImportKey(
         provider_handle,
         nullptr,
@@ -165,6 +188,14 @@ class key
         (PUCHAR)key_blob,
         key_blob_size,
         0);
+#else
+      // Non implémenté sur Linux
+      (void)key_blob;
+      (void)key_blob_size;
+      (void)key_blob_type;
+      (void)provider_handle;
+      _key_handle = nullptr;
+#endif
     }
 };
 

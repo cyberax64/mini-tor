@@ -2,7 +2,12 @@
 #include <mini/string.h>
 #include <mini/byte_buffer.h>
 
+#ifdef MINI_OS_WINDOWS
 #include <windows.h>
+#else
+// Pour Linux, définir DWORD comme un type équivalent
+typedef unsigned long DWORD;
+#endif
 
 namespace mini::crypto::capi::detail {
 

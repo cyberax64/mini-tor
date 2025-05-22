@@ -44,6 +44,7 @@ write(
   va_end(args);
 }
 
+#ifdef MINI_OS_WINDOWS
 void
 write_with_color(
   WORD color,
@@ -56,6 +57,20 @@ write_with_color(
   write_with_color_args(color, format, args);
   va_end(args);
 }
+#else
+void
+write_with_color(
+  const char* color,
+  const char* format,
+  ...
+  )
+{
+  va_list args;
+  va_start(args, format);
+  write_with_color_args(color, format, args);
+  va_end(args);
+}
+#endif
 
 void
 write_args(
@@ -69,6 +84,7 @@ write_args(
   }
 }
 
+#ifdef MINI_OS_WINDOWS
 void
 write_with_color_args(
   WORD color,
@@ -84,7 +100,6 @@ write_with_color_args(
     set_color(previous_color);
   }
 }
-
 
 WORD
 get_color(
@@ -104,5 +119,42 @@ set_color(
 {
   SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
 }
+#else
+// Linux implementation
+static const char* current_color = "\033[0m";
+
+void
+write_with_color_args(
+  const char* color,
+  const char* format,
+  va_list args
+  )
+{
+  mini_lock(g_console_output_mutex)
+  {
+    const char* previous_color = get_color();
+    set_color(color);
+    vprintf(format, args);
+    set_color(previous_color);
+  }
+}
+
+const char*
+get_color(
+  void
+  )
+{
+  return current_color;
+}
+
+void
+set_color(
+  const char* color
+  )
+{
+  current_color = color;
+  printf("%s", color);
+}
+#endif
 
 }

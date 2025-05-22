@@ -1,7 +1,9 @@
 #include "tcp_socket.h"
+#include <mini/memory.h>
 
 namespace mini::net {
 
+#ifdef MINI_OS_WINDOWS
 static WSADATA wsa_data = { 0 };
 
 static void __cdecl
@@ -36,6 +38,16 @@ tcp_socket_global_destroy(
     WSACleanup();
   }
 }
+#else
+// Linux initialization
+static void
+tcp_socket_global_init(
+  void
+  )
+{
+  // Rien à faire sous Linux
+}
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -127,6 +139,10 @@ tcp_socket::connect(
   )
 {
   hostent* h = gethostbyname(host.get_buffer());
+  if (!h)
+  {
+    return false;
+  }
 
   sockaddr_in sin;
   sin.sin_family = AF_INET;
@@ -134,6 +150,8 @@ tcp_socket::connect(
   memory::copy(&sin.sin_addr, h->h_addr_list[0], h->h_length);
 
   _ip = ip_address(sin.sin_addr.s_addr);
+  _host = host;
+  _port = port;
 
   if ((_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == SOCKET_ERROR)
   {

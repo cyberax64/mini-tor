@@ -2,7 +2,12 @@
 
 #include <mini/io/file_stream.h>
 
+#ifdef MINI_OS_WINDOWS
 #include <shlwapi.h>
+#else
+#include <sys/stat.h>
+#include <unistd.h>
+#endif
 
 namespace mini::io {
 
@@ -11,7 +16,27 @@ file::get_attributes(
   const string_ref path
   )
 {
+#ifdef MINI_OS_WINDOWS
   return file_attributes(GetFileAttributes(path.get_buffer()));
+#else
+  struct stat st;
+  if (stat(path.get_buffer(), &st) != 0) {
+    return file_attributes(0xFFFFFFFF); // INVALID_FILE_ATTRIBUTES
+  }
+  
+  DWORD attr = 0;
+  if (S_ISDIR(st.st_mode)) {
+    attr |= FILE_ATTRIBUTE_DIRECTORY;
+  }
+  if (!(st.st_mode & S_IWUSR)) {
+    attr |= FILE_ATTRIBUTE_READONLY;
+  }
+  if (S_ISLNK(st.st_mode)) {
+    attr |= FILE_ATTRIBUTE_REPARSE_POINT;
+  }
+  
+  return file_attributes(attr);
+#endif
 }
 
 bool

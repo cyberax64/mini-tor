@@ -1,7 +1,11 @@
 #pragma once
 #include <mini/common.h>
 
+#ifdef MINI_OS_WINDOWS
 #include <windows.h>
+#else
+#include <pthread.h>
+#endif
 
 #define mini_lock(mutex_instance)                             \
   if (::mini::threading::mutex_holder __h = mutex_instance)   \
@@ -47,7 +51,11 @@ class mutex
       );
 
   private:
+#ifdef MINI_OS_WINDOWS
     CRITICAL_SECTION _critical_section;
+#else
+    pthread_mutex_t _mutex;
+#endif
 };
 
 class mutex_holder
