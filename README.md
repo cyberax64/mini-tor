@@ -83,10 +83,3 @@ make
 
 Tout le code de ce dépôt est open-source sous la licence MIT. Voir le fichier **LICENSE.txt** dans ce dépôt.
 
-
-Si vous trouvez ce projet intéressant, vous pouvez m'offrir un café
-
-```
-  BTC 3GwZMNGvLCZMi7mjL8K6iyj6qGbhkVMNMF
-  LTC MQn5YC7bZd4KSsaj8snSg4TetmdKDkeCYk
-```
