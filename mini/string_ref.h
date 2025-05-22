@@ -3,6 +3,8 @@
 #include <mini/byte_buffer_ref.h>
 
 #include <iosfwd> // std::char_traits
+#include <cstdio> // std::sscanf
+#include <string> // Pour std::char_traits complet
 
 namespace mini {
 
