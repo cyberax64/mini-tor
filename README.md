@@ -4,6 +4,10 @@
 
 mini-tor est une implémentation minimaliste du protocole Tor en C++, mise à jour pour fonctionner avec le réseau Tor actuel (2025). Cette bibliothèque permet d'accéder au contenu internet et aux services cachés **(.onion)** via le réseau Tor. L'objectif est d'obtenir une taille aussi petite que possible (environ 47 Ko, compressé avec kkrunchy environ 20 Ko), ce qui est réalisé en utilisant Microsoft CryptoAPI/CNG au lieu d'intégrer OpenSSL.
 
+## Extension Python
+
+Une extension Python est disponible dans le dossier `python/`. Elle permet d'utiliser mini-tor depuis Python pour accéder aux services cachés Tor. Voir le fichier [python/README.md](python/README.md) pour plus d'informations.
+
 ## Fonctionnalités
 
 - Client Tor léger capable de se connecter au réseau Tor actuel
@@ -58,7 +62,7 @@ Cela réduira également considérablement la taille de l'exécutable.
 
 ### Création d'un service caché
 
-Voir le fichier `serviceServer.cpp` pour un exemple complet de création d'un serveur HTTP accessible comme service caché Tor.
+Un exemple de création d'un serveur HTTP accessible comme service caché Tor est disponible dans le code source.
 
 ### Remarques
 
