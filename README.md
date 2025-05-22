@@ -9,7 +9,6 @@ mini-tor est une implémentation minimaliste du protocole Tor en C++, mise à jo
 - Client Tor léger capable de se connecter au réseau Tor actuel
 - Support des services cachés (onion services) v2 et v3
 - Implémentation du protocole NTOR pour l'établissement de circuits
-- Création de services cachés Tor (voir `serviceServer.cpp`)
 
 ### Usage
 
